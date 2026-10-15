@@ -1,0 +1,104 @@
+[project]
+name = "turnevent"
+version = "0.1.0"
+authors = [
+    { name = "Alexander Kostin", email = "iheartapplejr@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.14.1",
+    "pyyaml>=6.0.3",
+]
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.170.1",
+    "import-linter>=2.15",
+    "mypy>=2.4.0",
+    "pre-commit>=4.7.0",
+    "pre-commit-hooks>=6.0.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.1",
+    "types-pyyaml>=6.0.12.20260906",
+]
+
+# ------------------------------------ ruff
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D",       # docstrings
+    "COM812",  # conflicts w/ formatter
+    "EM",      # f-strings in exceptions
+    "TRY003",  # long exception msgs
+    "INP001",  # no __init__.py
+    "CPY001",  # no copyright
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004"]
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel", "core.frozen.FrozenModel"]
+
+# ----------------------------------- mypy
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool", "deprecated"]
+plugins = ["pydantic.mypy"]
+mypy_path = "src"
+explicit_package_bases = true
+files = ["src", "tests"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+# ------------------------------------- import-linter
+[tool.importlinter]
+root_packages = ["core"]
+
+[[tool.importlinter.contracts]]
+name = "layers: each layer imports only from layers below it"
+type = "layers"
+layers = [
+    "(cli)",
+    "(adapter)",
+    "(inference) | (training)",
+    "(artifact)",
+    "(features) | (labels) | (dataset)",
+    "(contracts)",
+    "core",
+]
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
+xfail_strict = true
+filterwarnings = ["error"]
+markers = ["slow: long-running tests (training, e2e)"]
+
+# ---------------------------------------------------------------- coverage
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+exclude_also = ["raise NotImplementedError", "@overload"]
