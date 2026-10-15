@@ -1,0 +1,29 @@
+# env
+.venv/
+.env
+.env.*
+
+# py
+__pycache__/
+.py[cod]
+dist/
+build/
+
+# tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+coverage.xml
+htmlcov/
+
+# data & runtime
+/data
+/artifacts/
+/runs/
+
+# os
+.DS_Store
+
+sow.pdf
