@@ -1,0 +1,59 @@
+default_install_hook_types: [pre-commit]
+
+repos:
+  - repo: local
+    hooks:
+      - id: large-files
+        name: block large files
+        entry: uv run check-added-large-files --maxkb=500
+        language: system
+      - id: private-keys
+        name: block private keys
+        entry: uv run detect-private-key
+        language: system
+      - id: merge-conflicts
+        name: block merge-conflict markers
+        entry: uv run check-merge-conflict
+        language: system
+      - id: eof
+        name: fix end of files
+        entry: uv run end-of-file-fixer
+        language: system
+        types: [text]
+      - id: whitespace
+        name: trim trailing whitespace
+        entry: uv run trailing-whitespace-fixer
+        language: system
+        types: [text]
+      - id: toml
+        name: check toml syntax
+        entry: uv run check-toml
+        language: system
+        types: [toml]
+      - id: yaml
+        name: check yaml syntax
+        entry: uv run check-yaml
+        language: system
+        types: [yaml]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format --check
+        language: system
+        types: [python]
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check
+        language: system
+        types: [python]
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: import-layers
+        name: import layers
+        entry: env PYTHONPATH=src uv run lint-imports
+        language: system
+        types: [python]
+        pass_filenames: false
