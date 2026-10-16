@@ -6,6 +6,10 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "numpy>=2.5.4",
+    "packaging>=26.3",
+    "pandas>=3.0.6",
+    "pyarrow>=26.0.0",
     "pydantic>=2.14.1",
     "pyyaml>=6.0.3",
 ]
@@ -18,8 +22,10 @@ dev = [
     "hypothesis>=6.170.1",
     "import-linter>=2.15",
     "mypy>=2.4.0",
+    "pandas-stubs>=3.0.5.260914",
     "pre-commit>=4.7.0",
     "pre-commit-hooks>=6.0.0",
+    "pyarrow-stubs>=20.0.0.20260819",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
     "ruff>=0.17.1",
@@ -65,7 +71,7 @@ warn_required_dynamic_aliases = true
 
 # ------------------------------------- import-linter
 [tool.importlinter]
-root_packages = ["core", "contracts"]
+root_packages = ["core", "contracts", "dataset"]
 
 [[tool.importlinter.contracts]]
 name = "layers: each layer imports only from layers below it"
