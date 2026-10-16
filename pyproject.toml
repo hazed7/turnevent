@@ -71,7 +71,7 @@ warn_required_dynamic_aliases = true
 
 # ------------------------------------- import-linter
 [tool.importlinter]
-root_packages = ["core", "contracts", "dataset"]
+root_packages = ["core", "contracts", "dataset", "labels"]
 
 [[tool.importlinter.contracts]]
 name = "layers: each layer imports only from layers below it"
@@ -81,7 +81,8 @@ layers = [
     "(adapter)",
     "(inference) | (training)",
     "(artifact)",
-    "(features) | (labels) | (dataset)",
+    "(features) | (labels)",
+    "(dataset)",
     "(contracts)",
     "core",
 ]
