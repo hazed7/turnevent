@@ -1,0 +1,55 @@
+{
+  "timeframe": "1m",
+  "lookbackSteps": 64,
+  "featureColumns": [
+    "rd_value",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+  ],
+  "generatedAt": "2026-10-16T12:00:05Z",
+  "items": [
+    {
+      "symbol": "SYM003",
+      "state": "WARMUP",
+      "reason": "not_enough_points",
+      "pointsCollected": 40,
+      "expectedPoints": 64,
+      "windowStartTimestamp": 1760004840000,
+      "windowEndTimestamp": 1760007180000,
+      "features": null
+    },
+    {
+      "symbol": "SYM004",
+      "state": "WARMUP",
+      "reason": "stale_data",
+      "pointsCollected": 64,
+      "expectedPoints": 64,
+      "windowStartTimestamp": 1760003400000,
+      "windowEndTimestamp": 1760007180000,
+      "features": null
+    },
+    {
+      "symbol": "SYM005",
+      "state": "WARMUP",
+      "reason": "missing_joined_rows",
+      "pointsCollected": 61,
+      "expectedPoints": 64,
+      "windowStartTimestamp": 1760003400000,
+      "windowEndTimestamp": 1760007180000,
+      "features": null
+    },
+    {
+      "symbol": "SYM006",
+      "state": "WARMUP",
+      "reason": null,
+      "pointsCollected": 10,
+      "expectedPoints": 64,
+      "windowStartTimestamp": 1760006640000,
+      "windowEndTimestamp": 1760007180000,
+      "features": null
+    }
+  ]
+}
