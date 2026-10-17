@@ -6,6 +6,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "joblib>=1.6.0",
     "numpy>=2.5.4",
     "packaging>=26.3",
     "pandas>=3.0.6",
@@ -71,7 +72,7 @@ init_typed = true
 warn_required_dynamic_aliases = true
 
 [[tool.mypy.overrides]]
-module = ["sklearn", "sklearn.*"]
+module = ["sklearn", "sklearn.*", "joblib"]
 ignore_missing_imports = true
 
 # ------------------------------------- import-linter
@@ -112,3 +113,4 @@ fail_under = 90
 show_missing = true
 skip_covered = true
 exclude_also = ["raise NotImplementedError", "@overload"]
+
