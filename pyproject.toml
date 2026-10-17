@@ -12,6 +12,7 @@ dependencies = [
     "pyarrow>=26.0.0",
     "pydantic>=2.14.1",
     "pyyaml>=6.0.3",
+    "scikit-learn>=1.9.1",
 ]
 
 [tool.uv]
@@ -69,9 +70,13 @@ init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 
+[[tool.mypy.overrides]]
+module = ["sklearn", "sklearn.*"]
+ignore_missing_imports = true
+
 # ------------------------------------- import-linter
 [tool.importlinter]
-root_packages = ["core", "contracts", "dataset", "labels", "features"]
+root_packages = ["core", "contracts", "dataset", "labels", "features", "artifact", "training"]
 
 [[tool.importlinter.contracts]]
 name = "layers: each layer imports only from layers below it"
