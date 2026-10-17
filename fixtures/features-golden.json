@@ -1,5 +1,5 @@
 {
-  "builder_version": "1.0.0",
+  "builder_version": "1.1.0",
   "source": "online-ready.json",
   "windows": [
     {
@@ -10,6 +10,10 @@
         "distance_from_mean_20": 0.005150449510339639,
         "lower_wick": 0.0004820141577880375,
         "missing_bars": 0.0,
+        "pivot_fall": 0.7523982739559902,
+        "pivot_high": 1.0,
+        "pivot_low": 0.0,
+        "pivot_rise": -0.37495096465892047,
         "pullback_7": -0.0006241187530877678,
         "range_position_20": 0.9158612057575907,
         "range_position_64": 0.9489559164733141,
@@ -46,6 +50,10 @@
         "distance_from_mean_20": 0.0029999882218506727,
         "lower_wick": 0.00032150025126952993,
         "missing_bars": 7.0,
+        "pivot_fall": 0.21661470322562185,
+        "pivot_high": 0.0,
+        "pivot_low": 0.0,
+        "pivot_rise": 0.050992161776287355,
         "pullback_7": 0.0,
         "range_position_20": 0.9930582337061571,
         "range_position_64": 0.9959410703547953,

@@ -108,6 +108,19 @@ def test_flat_window_has_well_defined_features() -> None:
     assert row["return_63"] == row["volatility_20"] == row["rd_value_zscore_64"] == 0.0
     assert row["range_position_20"] == 0.5
     assert row["missing_bars"] == 0.0
+    assert row["pivot_low"] == row["pivot_high"] == row["pivot_rise"] == row["pivot_fall"] == 0.0
+
+
+def test_pivot_features_spot_a_confirmed_swing_four_bars_back() -> None:
+    closes = np.full(WINDOW_LENGTH, 10.0) + np.arange(WINDOW_LENGTH) * 0.001
+    closes[-4] -= 2.0
+    matrices = np.zeros((1, WINDOW_LENGTH, len(FEATURE_COLUMNS)))
+    for column in (Column.OPEN, Column.HIGH, Column.LOW, Column.CLOSE):
+        matrices[0, :, FEATURE_COLUMNS.index(column)] = closes
+    row = build_features(WindowBatch(matrices, np.array([0]), np.array([0]))).iloc[0]
+    assert (row["pivot_low"], row["pivot_high"]) == (1.0, 0.0)
+    assert row["pivot_rise"] > 0
+    assert row["pivot_fall"] < 0
 
 
 def test_gaps_inside_a_window_are_counted_not_filled(load_fixture: LoadFixture) -> None:

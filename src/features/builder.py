@@ -10,9 +10,10 @@ from core.errors import InvalidInputError
 from dataset.cleaning import CleanDataset
 from features.windows import Floats, WindowBatch, iter_clean_windows
 
-FEATURE_BUILDER_VERSION: Final = "1.0.0"
+FEATURE_BUILDER_VERSION: Final = "1.1.0"
 
 _CHUNK_ROWS: Final = 50_000
+_SWING_SIDE: Final = 3
 
 
 class _Bars:
@@ -79,6 +80,33 @@ def _rd_zscore(b: _Bars) -> Floats:
 def _missing_bars(b: _Bars) -> Floats:
     span_bars = np.floor((b.end_ms - b.start_ms) / BAR_INTERVAL_MS)
     return (span_bars - (WINDOW_LENGTH - 1)).clip(min=0.0)
+
+
+def _swing(b: _Bars) -> tuple[Floats, Floats, Floats]:
+    pivot = -_SWING_SIDE - 1
+    return b.close[:, pivot - _SWING_SIDE : pivot], b.close[:, pivot], b.close[:, pivot + 1 :]
+
+
+def _pivot_low(b: _Bars) -> Floats:
+    left, pivot, right = _swing(b)
+    return (pivot < np.minimum(left.min(axis=1), right.min(axis=1))).astype(np.float64)
+
+
+def _pivot_high(b: _Bars) -> Floats:
+    left, pivot, right = _swing(b)
+    return (pivot > np.maximum(left.max(axis=1), right.max(axis=1))).astype(np.float64)
+
+
+def _pivot_rise(b: _Bars) -> Floats:
+    left, pivot, right = _swing(b)
+    rise = np.minimum(left.max(axis=1), right.max(axis=1)) - pivot
+    return _ratio(rise, _average_true_range(b, 14), default=0.0)
+
+
+def _pivot_fall(b: _Bars) -> Floats:
+    left, pivot, right = _swing(b)
+    fall = pivot - np.maximum(left.min(axis=1), right.min(axis=1))
+    return _ratio(fall, _average_true_range(b, 14), default=0.0)
 
 
 def _mean_volume(b: _Bars, bars: int) -> Floats:
@@ -179,6 +207,26 @@ FEATURES: Final = (
         lambda b: _mean_volume(b, 5),
     ),
     Feature("missing_bars", "1m bars missing between window start and end", _missing_bars),
+    Feature(
+        "pivot_low",
+        "1 if the close 4 bars back is below the 3 closes on each side of it",
+        _pivot_low,
+    ),
+    Feature(
+        "pivot_high",
+        "1 if the close 4 bars back is above the 3 closes on each side of it",
+        _pivot_high,
+    ),
+    Feature(
+        "pivot_rise",
+        "smaller swing up from the close 4 bars back, in 14-bar average true ranges",
+        _pivot_rise,
+    ),
+    Feature(
+        "pivot_fall",
+        "smaller swing down into the close 4 bars back, in 14-bar average true ranges",
+        _pivot_fall,
+    ),
 )
 FEATURE_NAMES: Final = tuple(feature.name for feature in FEATURES)
 
