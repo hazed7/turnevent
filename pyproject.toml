@@ -115,7 +115,9 @@ skip_covered = true
 exclude_also = ["raise NotImplementedError", "@overload"]
 
 # ---------------------------------------------------------------- pyright (editor only)
-[tool.pyright]
+[tool.basedpyright]
+typeCheckingMode = "standard"
+enableTypeIgnoreComments = true
 pythonVersion = "3.13"
 venvPath = "."
 venv = ".venv"
