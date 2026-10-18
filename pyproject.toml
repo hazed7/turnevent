@@ -77,7 +77,7 @@ ignore_missing_imports = true
 
 # ------------------------------------- import-linter
 [tool.importlinter]
-root_packages = ["core", "contracts", "dataset", "labels", "features", "artifact", "training", "inference"]
+root_packages = ["core", "contracts", "dataset", "labels", "features", "artifact", "training", "inference", "adapter"]
 
 [[tool.importlinter.contracts]]
 name = "layers: each layer imports only from layers below it"
