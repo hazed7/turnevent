@@ -54,6 +54,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "PLR2004"]
+"{src,tests/unit}/{reporting,cli}/**" = ["RUF001", "RUF002", "RUF003"]  # cyrillic texts
 
 # ----------------------------------- mypy
 [tool.mypy]
@@ -77,13 +78,26 @@ ignore_missing_imports = true
 
 # ------------------------------------- import-linter
 [tool.importlinter]
-root_packages = ["core", "contracts", "dataset", "labels", "features", "artifact", "training", "inference", "adapter"]
+root_packages = [
+    "core",
+    "contracts",
+    "dataset",
+    "labels",
+    "features",
+    "artifact",
+    "training",
+    "inference",
+    "adapter",
+    "reporting",
+    "cli",
+]
 
 [[tool.importlinter.contracts]]
 name = "layers: each layer imports only from layers below it"
 type = "layers"
 layers = [
     "(cli)",
+    "(reporting)",
     "(adapter)",
     "(inference) | (training)",
     "(artifact)",
@@ -112,7 +126,7 @@ source = ["src"]
 fail_under = 90
 show_missing = true
 skip_covered = true
-exclude_also = ["raise NotImplementedError", "@overload"]
+exclude_also = ["raise NotImplementedError", "@overload", "if __name__ == .__main__.:"]
 
 # ---------------------------------------------------------------- pyright (editor only)
 [tool.basedpyright]
