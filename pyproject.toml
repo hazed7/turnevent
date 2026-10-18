@@ -114,3 +114,10 @@ show_missing = true
 skip_covered = true
 exclude_also = ["raise NotImplementedError", "@overload"]
 
+# ---------------------------------------------------------------- pyright (editor only)
+[tool.pyright]
+pythonVersion = "3.13"
+venvPath = "."
+venv = ".venv"
+extraPaths = ["src"]
+useLibraryCodeForTypes = false
