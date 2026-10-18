@@ -123,4 +123,15 @@ def _parse_item(item: JsonValue) -> ReadyWindow | PendingWindow | RejectedWindow
         return _WINDOW_ITEM.validate_json(to_json(item))
     except ValidationError as exc:
         symbol = item.get("symbol") if isinstance(item, dict) else None
-        return RejectedWindow(symbol=symbol if isinstance(symbol, str) else None, detail=str(exc))
+        return RejectedWindow(
+            symbol=symbol if isinstance(symbol, str) else None, detail=_describe(exc)
+        )
+
+
+def _describe(error: ValidationError, limit: int = 3) -> str:
+    problems = [
+        f"{'.'.join(str(part) for part in issue['loc'][1:]) or 'item'}: {issue['msg']}"
+        for issue in error.errors()[:limit]
+    ]
+    more = error.error_count() - limit
+    return "; ".join(problems) + (f" (+{more} more)" if more > 0 else "")
