@@ -24,3 +24,9 @@ test *args:
     uv run pytest --cov {{ args }}
 
 check: lint typecheck test
+
+pipeline:
+    uv run python -m cli all
+
+cli *args:
+    uv run python -m cli {{ args }}
