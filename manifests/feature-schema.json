@@ -1,0 +1,156 @@
+{
+  "builder_version": "1.1.0",
+  "features": [
+    {
+      "description": "log return over the last bar",
+      "name": "return_1"
+    },
+    {
+      "description": "log return over the last 3 bars",
+      "name": "return_3"
+    },
+    {
+      "description": "log return over the last 5 bars",
+      "name": "return_5"
+    },
+    {
+      "description": "log return over the last 10 bars",
+      "name": "return_10"
+    },
+    {
+      "description": "log return over the last 20 bars",
+      "name": "return_20"
+    },
+    {
+      "description": "log return over the whole window",
+      "name": "return_63"
+    },
+    {
+      "description": "std of 1-bar log returns, last 5 bars",
+      "name": "volatility_5"
+    },
+    {
+      "description": "std of 1-bar log returns, last 20 bars",
+      "name": "volatility_20"
+    },
+    {
+      "description": "average true range of the last 14 bars / last close",
+      "name": "atr_14"
+    },
+    {
+      "description": "(high - low) / close of the last bar",
+      "name": "bar_range"
+    },
+    {
+      "description": "(close - open) / close of the last bar",
+      "name": "bar_body"
+    },
+    {
+      "description": "(high - max(open, close)) / close of the last bar",
+      "name": "upper_wick"
+    },
+    {
+      "description": "(min(open, close) - low) / close of the last bar",
+      "name": "lower_wick"
+    },
+    {
+      "description": "close within the 20-bar low-high range",
+      "name": "range_position_20"
+    },
+    {
+      "description": "close within the window low-high range",
+      "name": "range_position_64"
+    },
+    {
+      "description": "log(close / mean close of the last 20 bars)",
+      "name": "distance_from_mean_20"
+    },
+    {
+      "description": "log(close / lowest close of the last 7 bars)",
+      "name": "rebound_7"
+    },
+    {
+      "description": "log(close / highest close of the last 7 bars)",
+      "name": "pullback_7"
+    },
+    {
+      "description": "share of the last 5 bars that closed above the previous close",
+      "name": "up_share_5"
+    },
+    {
+      "description": "rd_value of the last bar",
+      "name": "rd_value"
+    },
+    {
+      "description": "rd_value one bar earlier",
+      "name": "rd_value_lag_1"
+    },
+    {
+      "description": "rd_value three bars earlier",
+      "name": "rd_value_lag_3"
+    },
+    {
+      "description": "rd_value change over the last bar",
+      "name": "rd_value_change_1"
+    },
+    {
+      "description": "rd_value change over the last 5 bars",
+      "name": "rd_value_change_5"
+    },
+    {
+      "description": "mean rd_value, last 5 bars",
+      "name": "rd_value_mean_5"
+    },
+    {
+      "description": "mean rd_value, last 20 bars",
+      "name": "rd_value_mean_20"
+    },
+    {
+      "description": "std of rd_value, last 20 bars",
+      "name": "rd_value_std_20"
+    },
+    {
+      "description": "last rd_value as a z-score within the window",
+      "name": "rd_value_zscore_64"
+    },
+    {
+      "description": "log1p(last volume) - log1p(window mean volume)",
+      "name": "volume_1"
+    },
+    {
+      "description": "log1p(mean volume of the last 5 bars) - log1p(window mean volume)",
+      "name": "volume_5"
+    },
+    {
+      "description": "1m bars missing between window start and end",
+      "name": "missing_bars"
+    },
+    {
+      "description": "1 if the close 4 bars back is below the 3 closes on each side of it",
+      "name": "pivot_low"
+    },
+    {
+      "description": "1 if the close 4 bars back is above the 3 closes on each side of it",
+      "name": "pivot_high"
+    },
+    {
+      "description": "smaller swing up from the close 4 bars back, in 14-bar average true ranges",
+      "name": "pivot_rise"
+    },
+    {
+      "description": "smaller swing down into the close 4 bars back, in 14-bar average true ranges",
+      "name": "pivot_fall"
+    }
+  ],
+  "input_columns": [
+    "rd_value",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+  ],
+  "normalization": "stateless and per window, nothing is fitted on training data: prices enter as log ratios or fractions of the last close, volume as log1p ratios to the window mean, rd_value raw plus a z-score within the window",
+  "row_order": "oldest_to_newest",
+  "window_length": 64
+}

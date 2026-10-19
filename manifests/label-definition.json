@@ -1,0 +1,133 @@
+{
+  "baseline_parameters": {
+    "left_bars": 3,
+    "min_separation_bars": 4,
+    "right_bars": 3,
+    "scale_window_bars": 14,
+    "threshold_coefficient": 0.65
+  },
+  "dataset_sha256": "d255dd3aa3c5d65ce12ccf1591feb6a69f20c0df02b328c4697f7cef3683a79b",
+  "event_classes": [
+    {
+      "code": -1,
+      "meaning": "confirmed transition from rise to fall",
+      "name": "TURN_DOWN"
+    },
+    {
+      "code": 0,
+      "meaning": "no confirmed reversal at this bar",
+      "name": "NO_TURN"
+    },
+    {
+      "code": 1,
+      "meaning": "confirmed transition from fall to rise",
+      "name": "TURN_UP"
+    }
+  ],
+  "examples": [
+    {
+      "detection_delay_ms": 360000,
+      "event_timestamp": 1704068520000,
+      "label_available_timestamp": 1704068880000,
+      "turn_event": "NO_TURN",
+      "turn_state": "NEUTRAL"
+    },
+    {
+      "detection_delay_ms": 360000,
+      "event_timestamp": 1704068580000,
+      "label_available_timestamp": 1704068940000,
+      "turn_event": "NO_TURN",
+      "turn_state": "NEUTRAL"
+    },
+    {
+      "detection_delay_ms": 360000,
+      "event_timestamp": 1704068700000,
+      "label_available_timestamp": 1704069060000,
+      "turn_event": "TURN_DOWN",
+      "turn_state": "SELL_HOLD"
+    },
+    {
+      "detection_delay_ms": 360000,
+      "event_timestamp": 1704068940000,
+      "label_available_timestamp": 1704069300000,
+      "turn_event": "TURN_DOWN",
+      "turn_state": "SELL_HOLD"
+    },
+    {
+      "detection_delay_ms": 360000,
+      "event_timestamp": 1704072960000,
+      "label_available_timestamp": 1704073320000,
+      "turn_event": "TURN_UP",
+      "turn_state": "BUY_HOLD"
+    },
+    {
+      "detection_delay_ms": 360000,
+      "event_timestamp": 1704074820000,
+      "label_available_timestamp": 1704075180000,
+      "turn_event": "TURN_UP",
+      "turn_state": "BUY_HOLD"
+    }
+  ],
+  "generator_version": "1.0.0",
+  "parameters": {
+    "left_bars": 3,
+    "min_separation_bars": 4,
+    "right_bars": 3,
+    "scale_window_bars": 14,
+    "threshold_coefficient": 0.65
+  },
+  "rules": {
+    "candidate": "a bar whose close is the strict minimum (TURN_UP) or maximum (TURN_DOWN) of the 3+3 bars around it",
+    "detection_delay": "label_available_timestamp - event_timestamp, in milliseconds",
+    "disputed": "a bar whose close ties the minimum or maximum of its window: excluded",
+    "event_timestamp": "timestamp of the bar being labelled",
+    "gaps": "a bar whose dependency span crosses a missing 1m bar: excluded, never filled",
+    "insufficient_history": "the first 17 bars of each symbol: excluded",
+    "label_available_timestamp": "timestamp 6 bars later, the last bar the label depends on",
+    "no_confirmation": "the last 6 bars of each symbol: excluded",
+    "no_turn": "a labelled bar that is not a kept candidate",
+    "separation": "a candidate is kept only if it is stronger than every candidate closer than 4 bars; weaker ones become NO_TURN",
+    "significance": "the smaller of the swings into and out of the candidate must reach 0.65 x the trailing 14-bar average true range",
+    "turn_state": "state after the latest kept turn; resets to NEUTRAL at each symbol start and after every excluded bar"
+  },
+  "spec_version": "1.0.0",
+  "state_classes": [
+    {
+      "code": -1,
+      "meaning": "latest confirmed turn was TURN_DOWN",
+      "name": "SELL_HOLD"
+    },
+    {
+      "code": 0,
+      "meaning": "no confirmed turn since the last reset",
+      "name": "NEUTRAL"
+    },
+    {
+      "code": 1,
+      "meaning": "latest confirmed turn was TURN_UP",
+      "name": "BUY_HOLD"
+    }
+  ],
+  "summary": {
+    "by_status": {
+      "disputed": 0,
+      "gap": 2108,
+      "insufficient_history": 51,
+      "labelled": 57639,
+      "no_confirmation": 18
+    },
+    "labelled": 57639,
+    "rows": 59816,
+    "turn_event": {
+      "NO_TURN": 55174,
+      "TURN_DOWN": 1250,
+      "TURN_UP": 1215
+    },
+    "turn_state": {
+      "BUY_HOLD": 26762,
+      "NEUTRAL": 3505,
+      "SELL_HOLD": 27372
+    }
+  },
+  "target": "turn_event"
+}

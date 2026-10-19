@@ -1,0 +1,28 @@
+{
+  "bar_interval_ms": 60000,
+  "cleaning_policy_version": "1.0.0",
+  "dataset_version": "ds-d255dd3aa3c5",
+  "ignored_columns": [
+    "signal_barrier"
+  ],
+  "loaded_columns": [
+    "timestamp",
+    "symbol",
+    "rd_value",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+  ],
+  "manifest_version": "1.0.0",
+  "n_symbols": 3,
+  "period_end_ms": 1705267140000,
+  "period_start_ms": 1704067200000,
+  "rows_clean": 59816,
+  "rows_raw": 59877,
+  "sha256": "d255dd3aa3c5d65ce12ccf1591feb6a69f20c0df02b328c4697f7cef3683a79b",
+  "source_file": "synthetic.csv",
+  "source_format": "csv",
+  "timeframe": "1m"
+}

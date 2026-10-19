@@ -1,0 +1,40 @@
+{
+  "boundaries_ms": [
+    1704787068000,
+    1705025964000
+  ],
+  "config": {
+    "embargo_bars": 60,
+    "test_fraction": 0.2,
+    "validation_fraction": 0.2
+  },
+  "embargo_ms": 3600000,
+  "periods": [
+    {
+      "dropped_at_edges": 9,
+      "end_ms": 1704787068000,
+      "keys_fingerprint": "6cf852f200384f00de258094cc7785c4b1193d51160cd3745450c0c65fce8615",
+      "part": "train",
+      "samples": 34502,
+      "start_ms": 1704067200000
+    },
+    {
+      "dropped_at_edges": 366,
+      "end_ms": 1705025964000,
+      "keys_fingerprint": "3485f71d133dcec49228eb9e15762ece18598561929bf8df448b0d81a94e8528",
+      "part": "validation",
+      "samples": 11138,
+      "start_ms": 1704790668000
+    },
+    {
+      "dropped_at_edges": 369,
+      "end_ms": 1705267140001,
+      "keys_fingerprint": "927a96f7c222ac8daaa2402d6f1f728036d07c9e452b95c1a9febd7aa59292d5",
+      "part": "test",
+      "samples": 11135,
+      "start_ms": 1705029564000
+    }
+  ],
+  "policy_version": "1.0.0",
+  "rule": "sequential by event time, never shuffled; a sample belongs to a part only if every bar its features or label depend on lies inside that part's period (purge), and each later period starts embargo_ms after its boundary (embargo)"
+}

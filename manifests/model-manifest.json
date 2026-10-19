@@ -1,0 +1,127 @@
+{
+  "artifact_kind": "turnevent-classifier-bundle",
+  "bundle_format_version": "1.0.0",
+  "dataset_sha256": "d255dd3aa3c5d65ce12ccf1591feb6a69f20c0df02b328c4697f7cef3683a79b",
+  "dataset_version": "ds-d255dd3aa3c5",
+  "documents": {
+    "feature-schema.json": "bb26fc6c1d73a8a91d43fe08e2ee79d0a6bf515dc1b9321e40cc4dbae7093973",
+    "label-definition.json": "56d87b1149198a439b43a9f1ac069e8a3a607bc160f520fe7caa6f36d3dfa412",
+    "split-manifest.json": "bc1a1ad114ee27e8a1a5a4f49cbd2516b4b12f27db766ca68c85daf84d5d6164",
+    "training-config.json": "5677000661097cca504da30ba8279abbfb6c8411742181ba79343e80f08f323d"
+  },
+  "event_classes": [
+    {
+      "code": -1,
+      "meaning": "confirmed transition from rise to fall",
+      "name": "TURN_DOWN"
+    },
+    {
+      "code": 0,
+      "meaning": "no confirmed reversal at this bar",
+      "name": "NO_TURN"
+    },
+    {
+      "code": 1,
+      "meaning": "confirmed transition from fall to rise",
+      "name": "TURN_UP"
+    }
+  ],
+  "event_model": {
+    "path": "event-model.joblib",
+    "sha256": "08c1ee623c87722052d67e50b81f72226b7c1e380670563afdf1fe620b58b2f2"
+  },
+  "event_turn_threshold": 0.36,
+  "feature_names": [
+    "return_1",
+    "return_3",
+    "return_5",
+    "return_10",
+    "return_20",
+    "return_63",
+    "volatility_5",
+    "volatility_20",
+    "atr_14",
+    "bar_range",
+    "bar_body",
+    "upper_wick",
+    "lower_wick",
+    "range_position_20",
+    "range_position_64",
+    "distance_from_mean_20",
+    "rebound_7",
+    "pullback_7",
+    "up_share_5",
+    "rd_value",
+    "rd_value_lag_1",
+    "rd_value_lag_3",
+    "rd_value_change_1",
+    "rd_value_change_5",
+    "rd_value_mean_5",
+    "rd_value_mean_20",
+    "rd_value_std_20",
+    "rd_value_zscore_64",
+    "volume_1",
+    "volume_5",
+    "missing_bars",
+    "pivot_low",
+    "pivot_high",
+    "pivot_rise",
+    "pivot_fall"
+  ],
+  "feature_schema_version": "1.1.0",
+  "label_generator_version": "1.0.0",
+  "label_schema_version": "1.0.0",
+  "metrics": {
+    "balanced_accuracy": 0.9045026868011479,
+    "detection_rate": 0.8640167364016736,
+    "event_log_loss": 0.050018371437801204,
+    "false_turn_rate": 0.26512455516014233,
+    "macro_f1": 0.8595133570177541,
+    "majority_macro_f1": 0.32602178169358786,
+    "median_delay_bars": 3.0,
+    "rd_value_rule_macro_f1": 0.35358994792575466,
+    "state_log_loss": 0.789982592749913,
+    "state_macro_f1": 0.5779599807109147,
+    "test_samples": 11135
+  },
+  "model_version": "tm-0e83fa449b55",
+  "normalization_spec": "stateless and per window, nothing is fitted on training data: prices enter as log ratios or fractions of the last close, volume as log1p ratios to the window mean, rd_value raw plus a z-score within the window",
+  "prediction_lag_bars": 3,
+  "runtime": {
+    "lockfile_sha256": "2305fd631c6623c58c4a6d7bf56d81952f4aa441e8603fd74a6eda355c153bce",
+    "packages": {
+      "joblib": "1.6.0",
+      "numpy": "2.5.4",
+      "packaging": "26.3",
+      "pandas": "3.0.6",
+      "pyarrow": "26.0.0",
+      "pydantic": "2.14.1",
+      "pyyaml": "6.0.3",
+      "scikit-learn": "1.9.1"
+    },
+    "python": "3.13.13"
+  },
+  "state_classes": [
+    {
+      "code": -1,
+      "meaning": "latest confirmed turn was TURN_DOWN",
+      "name": "SELL_HOLD"
+    },
+    {
+      "code": 0,
+      "meaning": "no confirmed turn since the last reset",
+      "name": "NEUTRAL"
+    },
+    {
+      "code": 1,
+      "meaning": "latest confirmed turn was TURN_UP",
+      "name": "BUY_HOLD"
+    }
+  ],
+  "state_model": {
+    "path": "state-model.joblib",
+    "sha256": "3dda62e0db2e45711e63dfdc40dec7977c750666b19e39980536ac5d4d6a9065"
+  },
+  "timeframe": "1m",
+  "window_length": 64
+}
