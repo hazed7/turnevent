@@ -1,0 +1,43 @@
+paths:
+  dataset: data/synthetic.csv     # replace with the approved dataset (csv or parquet)
+  fixtures: fixtures
+  manifests: manifests
+  reports: reports
+  artifacts: artifacts
+  runs: runs
+
+synthetic:
+  seed: 7
+  n_symbols: 3
+  bars_per_symbol: 20000
+  gap_rate: 0.002
+  missing_join_rate: 0.001
+  plant_defects: true
+
+training:
+  prediction_lag_bars: 3          # signal fires once the turn is confirmed
+  labels:
+    left_bars: 3
+    right_bars: 3
+    min_separation_bars: 4
+    threshold_coefficient: 0.65
+    scale_window_bars: 14
+  split:
+    validation_fraction: 0.2
+    test_fraction: 0.2
+    embargo_bars: 60
+  model:
+    regularization: 1.0
+    max_iter: 2000
+    calibrate: true
+    calibration_folds: 3
+    seed: 42
+  evaluation:
+    delay_tolerance_bars: 6
+    time_segments: 4
+
+retry:
+  attempts: 4
+  initial_delay_s: 0.5
+  max_delay_s: 8.0
+  timeout_s: 10.0
