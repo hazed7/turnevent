@@ -8,11 +8,12 @@
 
 ```bash
 just install    # зависимости и pre-commit
-just pipeline   # синтетика -> аудит -> обучение -> прогон
+just demo       # новая синтетика -> аудит -> обучение -> прогон
+just pipeline   # аудит -> обучение -> прогон на существующем датасете
 just check      # линтеры, mypy, тесты
 ```
 
-После `just pipeline` в `reports/` лежат отчёты, в `manifests/` манифесты, а модель
+После `just demo` или `just pipeline` в `reports/` лежат отчёты, в `manifests/` манифесты, а модель
 сохраняется в `artifacts/<model_version>/`. Версия модели считается из содержимого, так
 что на тех же данных и конфиге получается тот же bundle.
 
@@ -21,13 +22,14 @@ just check      # линтеры, mypy, тесты
 Отдельные шаги запускаются через `just cli <команда>`, параметры берутся из
 `configs/pipeline.yaml`.
 
-- `synthetic` генерирует синтетический датасет
+- `synthetic` генерирует новый CSV; существующий файл не перезаписывает
+- `demo` явно генерирует новый CSV и выполняет аудит, обучение и smoke
 - `audit` пишет `reports/data-audit.md`, манифест датасета и определение разметки
 - `train` обучает модель, сохраняет бандл и пишет `evaluation.md` и `model-card.md`
 - `infer --fixture fixtures/online-ready.json` прогоняет один конверт из файла
 - `infer --url <endpoint> --mode shadow` берёт конверт с API и пишет сигналы в shadow
 - `smoke` прогоняет все фикстуры и пишет `reports/online-inference.md`
-- `all` делает всё по очереди
+- `all` выполняет аудит, обучение и smoke на существующих данных, без генерации синтетики
 
 Результаты `infer` складываются в `runs/`: в `telemetry.jsonl` попадает каждое окно, в
 `outbox.jsonl` отправленные сигналы, а `ledger.jsonl` следит, чтобы одно окно не ушло
@@ -36,7 +38,8 @@ just check      # линтеры, mypy, тесты
 ## Данные
 
 Путь к датасету задаётся в `paths.dataset`. Подходит CSV или parquet с колонками
-`timestamp, symbol, rd_value, open, high, low, close, volume, signal_barrier`
+`timestamp, symbol, rd_value, open, high, low, close, volume`.
+`signal_barrier` может присутствовать в исходном CSV, но не используется моделью.
 
 ## Структура
 
