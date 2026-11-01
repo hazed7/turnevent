@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import tempfile
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Final
@@ -41,8 +42,21 @@ COMPARED_LAG: Final = 0
 
 
 def synthetic(config: PipelineConfig) -> Path:
-    write_synthetic_csv(config.synthetic, config.paths.dataset)
-    return config.paths.dataset
+    path = config.paths.dataset
+    if path.suffix.lower() != ".csv":
+        raise ConfigError("synthetic data requires a new .csv dataset path; use a demo config")
+    if path.exists() or path.is_symlink():
+        raise ConfigError(f"refusing to overwrite dataset {path}; choose a new path")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=path.parent, prefix=".synthetic-") as directory:
+        temporary = Path(directory) / "dataset.csv"
+        write_synthetic_csv(config.synthetic, temporary)
+        try:
+            # Atomic publication without replacing an existing file (including a concurrent writer).
+            os.link(temporary, path)
+        except FileExistsError as exc:
+            raise ConfigError(f"refusing to overwrite dataset {path}; choose a new path") from exc
+    return path
 
 
 def audit(config: PipelineConfig) -> Path:
@@ -138,11 +152,15 @@ def smoke(config: PipelineConfig, bundle: Path | None = None) -> Path:
 
 
 def run_all(config: PipelineConfig) -> ModelManifest:
-    synthetic(config)
     audit(config)
     manifest = train(config)
     smoke(config)
     return manifest
+
+
+def demo(config: PipelineConfig) -> ModelManifest:
+    synthetic(config)
+    return run_all(config)
 
 
 def latest_bundle(config: PipelineConfig) -> Path:

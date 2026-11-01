@@ -29,6 +29,7 @@ def _run(args: argparse.Namespace, config: PipelineConfig) -> None:
         "infer": lambda: _infer(args, config),
         "smoke": lambda: f"online report written to {commands.smoke(config, args.bundle)}",
         "all": lambda: f"pipeline finished: {commands.run_all(config).model_version}",
+        "demo": lambda: f"demo finished: {commands.demo(config).model_version}",
     }
     sys.stdout.write(handlers[args.command]() + "\n")
 
@@ -56,7 +57,8 @@ def _parser() -> argparse.ArgumentParser:
     infer.add_argument("--bundle", type=Path, help="bundle directory (default: latest)")
     smoke = sub.add_parser("smoke", help="run the online fixtures and write the online report")
     smoke.add_argument("--bundle", type=Path)
-    sub.add_parser("all", help="synthetic -> audit -> train -> smoke")
+    sub.add_parser("all", help="existing dataset: audit -> train -> smoke")
+    sub.add_parser("demo", help="new synthetic CSV -> audit -> train -> smoke (no overwrite)")
     return parser
 
 

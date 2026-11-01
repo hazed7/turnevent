@@ -1,0 +1,11 @@
+# Run commands from the repository root after preparing the dataset.
+paths:
+  dataset: data/prepared/marketscreener-2026-10-v1.parquet
+  fixtures: fixtures
+  manifests: data/experiments/marketscreener-2026-10-v1/manifests
+  reports: data/experiments/marketscreener-2026-10-v1/reports
+  artifacts: data/experiments/marketscreener-2026-10-v1/artifacts
+  runs: data/experiments/marketscreener-2026-10-v1/runs
+
+# Label, split and model parameters inherit the current pipeline defaults.
+# Successful training verifies integration; it does not validate the methodology.
