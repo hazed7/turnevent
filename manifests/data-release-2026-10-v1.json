@@ -1,0 +1,57 @@
+{
+  "release_version": "marketscreener-2026-10-v1",
+  "source": "https://ms.2eng.ru/api/ml/ds/dataset-prod/",
+  "archive": {
+    "file_name": "marketscreener-2026-10-v1.zip",
+    "url": "https://drive.google.com/file/d/10YqJjqpGqzwEHubJa321IudcK7kIZTge/view?usp=sharing",
+    "bytes": 130765299,
+    "sha256": "2dc781c40f51b64fedfb1b9418c3a4cc7fb9a46b54ffb13cec27254eeb743a96"
+  },
+  "period": {
+    "start": "2026-10-01",
+    "end": "2026-10-31",
+    "timezone": "UTC"
+  },
+  "csv_files": 5698,
+  "rows": 8184077,
+  "symbols": 243,
+  "available_days": 26,
+  "raw_bytes": 559114538,
+  "missing_dates": [
+    "2026-10-16",
+    "2026-10-28",
+    "2026-10-29",
+    "2026-10-30",
+    "2026-10-31"
+  ],
+  "quality": {
+    "csv_with_internal_gaps": 1253,
+    "missing_internal_minute_observations": 9525,
+    "csv_shorter_than_full_day": 1267,
+    "gaps_filled": false
+  },
+  "raw_columns": [
+    "timestamp",
+    "symbol",
+    "rd_value",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "signal_barrier"
+  ],
+  "timestamp_unit": "UTC Unix milliseconds",
+  "excluded_model_columns": [
+    "signal_barrier"
+  ],
+  "files": {
+    "manifests/2026-10-download-manifest.json": "9a230b626e2559ff7602db4488713dad55f5458839fdc5e7d44105b92a7ea06f",
+    "manifests/2026-10-sha256sums.txt": "cc55d68a9f6b981c78f18f06fdd715ab297f69a70be42fd2be01fd007bf665d8",
+    "manifests/2026-10-verification.json": "1485a827b056a9ba376550c8e2f58ecc4a8ee673e860f55d99bab685a92284d1"
+  },
+  "verification": {
+    "archive": "locally verified CRC and all 5698 CSV SHA256",
+    "shared_link": "provided by user; remote download not checked"
+  }
+}
