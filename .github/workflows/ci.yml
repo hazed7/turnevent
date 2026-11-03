@@ -26,4 +26,4 @@ jobs:
       - run: uv run lint-imports
       - run: uv run mypy
       - run: uv run pytest --cov
-      - run: uv run python -m cli all
+      - run: uv run python -m cli demo
