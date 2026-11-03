@@ -165,6 +165,13 @@ def test_accepts_binary_mode_checksums_and_blank_lines(
     assert prepare_dataset(source, tmp_path / "out.parquet")["inventory_files"] == 3
 
 
+def test_skips_blank_csv_lines(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    _write(source, "RLC", "2026-10-19", [_row(START), "", _row(START + 60000), ""])
+    _checksums(source)
+    assert prepare_dataset(source, tmp_path / "out.parquet")["rows"] == 2
+
+
 def test_rejects_path_traversal_in_inventory(tmp_path: Path) -> None:
     source = _source(tmp_path)
     (source / CHECKSUMS).write_text("a" * 64 + "  ../../outside.csv\n")

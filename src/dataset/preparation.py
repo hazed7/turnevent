@@ -145,7 +145,7 @@ def _read(source: Path, item: InputFile) -> tuple[pa.Table, FileRecord]:
         reader = csv.reader(io.StringIO(data.decode("utf-8-sig")), strict=True)
         if tuple(next(reader, ())) != HISTORICAL_COLUMNS:
             raise DataContractError(f"unexpected CSV schema: {item.relative}")
-        rows = sorted((_row(row, item, day_start) for row in reader), key=lambda row: row[0])
+        rows = sorted((_row(row, item, day_start) for row in reader if row), key=lambda row: row[0])
     except (UnicodeDecodeError, csv.Error) as exc:
         raise DataContractError(f"malformed CSV: {item.relative}: {exc}") from exc
     if not rows:
