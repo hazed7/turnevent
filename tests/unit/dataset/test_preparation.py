@@ -1,5 +1,6 @@
 import hashlib
 import os
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
 
@@ -150,6 +151,18 @@ def test_never_overwrites_existing_outputs(tmp_path: Path, existing: str) -> Non
     with pytest.raises(DataContractError, match="already exists"):
         prepare_dataset(source, tmp_path / "out.parquet")
     assert destination.read_bytes() == b"keep"
+
+
+@pytest.mark.parametrize(
+    "edit", [lambda text: text.replace("  raw/", " *raw/"), lambda text: f"\n{text}\n"]
+)
+def test_accepts_binary_mode_checksums_and_blank_lines(
+    tmp_path: Path, edit: Callable[[str], str]
+) -> None:
+    source = _source(tmp_path)
+    checksums = source / CHECKSUMS
+    checksums.write_text(edit(checksums.read_text()))
+    assert prepare_dataset(source, tmp_path / "out.parquet")["inventory_files"] == 3
 
 
 def test_rejects_path_traversal_in_inventory(tmp_path: Path) -> None:

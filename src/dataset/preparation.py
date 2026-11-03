@@ -24,7 +24,7 @@ from core.serialization import sha256_bytes, sha256_file, to_pretty_json
 CHECKSUMS: Final = Path("manifests/2026-10-sha256sums.txt")
 DAY_MS: Final = 86_400_000
 ENTRY: Final = re.compile(
-    r"([0-9a-f]{64})  (raw/marketscreener/(\d{4}-\d{2}-\d{2})/([A-Za-z0-9_-]+)\.csv)"
+    r"([0-9a-f]{64}) [ *](raw/marketscreener/(\d{4}-\d{2}-\d{2})/([A-Za-z0-9_-]+)\.csv)"
 )
 _TYPES: Final[dict[str, pa.DataType]] = {
     "timestamp": pa.int64(),
@@ -72,6 +72,8 @@ class FileRecord(TypedDict):
 def _inventory(source: Path, checksums: Path) -> list[InputFile]:
     entries = []
     for number, line in enumerate(checksums.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
         match = ENTRY.fullmatch(line)
         if match is None:
             raise DataContractError(f"invalid checksum entry at line {number}")
