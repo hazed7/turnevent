@@ -12,7 +12,7 @@ from core.errors import DataContractError
 from dataset.loader import load_historical
 from dataset.preparation import CHECKSUMS, Selection, prepare_dataset
 
-START = 1792368000000  # 2026-10-19 00:00 UTC
+START = 1792368000000
 
 
 def _write(source: Path, symbol: str, day: str, rows: list[str]) -> Path:
@@ -64,7 +64,6 @@ def test_streams_sorted_parquet_with_provenance_and_preserves_gaps(tmp_path: Pat
     loaded = load_historical(output)
     assert len(loaded.frame) == 4
     assert not loaded.source.signal_barrier_present
-    # Same input produces byte-identical data and manifest, irrespective of target name.
     other = tmp_path / "other.parquet"
     assert prepare_dataset(source, other) == result
     assert output.read_bytes() == other.read_bytes()

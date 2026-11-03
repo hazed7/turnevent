@@ -1,5 +1,3 @@
-"""Validate frozen CSV exports and stream a deterministic model-input Parquet."""
-
 import csv
 import io
 import math
@@ -86,7 +84,6 @@ def _inventory(source: Path, checksums: Path) -> list[InputFile]:
         path = source / item.relative
         if not path.resolve().is_relative_to(source.resolve()) or not path.is_file():
             raise DataContractError(f"missing or unsafe source file: {item.relative}")
-    # Only inspect months represented in this release; other releases may coexist.
     actual = {
         path.relative_to(source).as_posix()
         for month in {item.day.isoformat()[:7] for item in entries}
@@ -132,7 +129,6 @@ def _row(row: list[str], item: InputFile, day_start: int) -> tuple[int, str, *tu
         raise DataContractError(f"invalid price/volume/OHLC: {item.relative}")
     if high < max(opening, close) or low > high:
         raise DataContractError(f"invalid OHLC range: {item.relative}")
-    # signal_barrier is intentionally never parsed or used in validation/selection.
     return timestamp, item.symbol, *values
 
 
@@ -200,7 +196,6 @@ def prepare_dataset(
     selection: Selection = DEFAULT_SELECTION,
     checksums: Path = CHECKSUMS,
 ) -> dict[str, object]:
-    """Verify inventory, validate selected files, publish Parquet + provenance without overwrite."""
     if output.suffix != ".parquet":
         raise DataContractError("output must have .parquet extension")
     manifest_path = output.with_suffix(output.suffix + ".manifest.json")

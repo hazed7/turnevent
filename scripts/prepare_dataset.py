@@ -1,5 +1,3 @@
-"""Run with PYTHONPATH=src, or use the just data-prepare recipe."""
-
 import argparse
 import json
 from datetime import date
