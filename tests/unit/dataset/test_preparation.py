@@ -176,7 +176,7 @@ def test_failed_manifest_publication_rolls_back_only_own_parquet(
             manifest.write_text("concurrent writer")
         link(source, target)
 
-    monkeypatch.setattr("dataset.preparation.os.link", racing_link)
+    monkeypatch.setattr("core.files.os.link", racing_link)
     with pytest.raises(FileExistsError):
         prepare_dataset(source, output)
     assert not output.exists()

@@ -3,7 +3,6 @@
 import csv
 import io
 import math
-import os
 import re
 from collections import Counter
 from collections.abc import Iterable
@@ -19,6 +18,7 @@ import pyarrow.parquet as pq
 
 from contracts.market import BAR_INTERVAL_MS, HISTORICAL_COLUMNS, MODEL_INPUT_COLUMNS
 from core.errors import DataContractError
+from core.files import publish_exclusive
 from core.serialization import sha256_bytes, sha256_file, to_pretty_json
 
 CHECKSUMS: Final = Path("manifests/2026-10-sha256sums.txt")
@@ -245,11 +245,5 @@ def prepare_dataset(
         }
         temporary_manifest = Path(temporary) / "manifest.json"
         temporary_manifest.write_text(to_pretty_json(manifest), encoding="utf-8")
-        # Hard links publish exclusively: never replace a concurrently created destination.
-        os.link(target, output)
-        try:
-            os.link(temporary_manifest, manifest_path)
-        except OSError:
-            output.unlink()
-            raise
+        publish_exclusive((target, output), (temporary_manifest, manifest_path))
     return manifest
