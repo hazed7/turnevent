@@ -1,3 +1,4 @@
+import contextlib
 import os
 import tempfile
 from pathlib import Path
@@ -33,6 +34,33 @@ def write_text_atomic(path: Path, text: str) -> None:
 
 def write_json(path: Path, value: object) -> None:
     write_text_atomic(path, to_pretty_json(value))
+
+
+def publish_exclusive(*pairs: tuple[Path, Path]) -> None:
+    for source, _ in pairs:
+        _fsync_file(source)
+    published: list[tuple[Path, Path]] = []
+    try:
+        for source, target in pairs:
+            os.link(source, target)
+            published.append((source, target))
+    except BaseException:
+        for source, target in reversed(published):
+            _unlink_if_same(target, source)
+        raise
+    for directory in {target.parent for _, target in pairs}:
+        _fsync_dir(directory)
+
+
+def _unlink_if_same(path: Path, original: Path) -> None:
+    with contextlib.suppress(OSError):
+        if path.samefile(original):
+            path.unlink()
+
+
+def _fsync_file(path: Path) -> None:
+    with path.open("rb") as handle:
+        os.fsync(handle.fileno())
 
 
 def _fsync_dir(directory: Path) -> None:
