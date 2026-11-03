@@ -117,6 +117,12 @@ def test_rejects_inventory_or_hash_mismatch(tmp_path: Path, kind: str) -> None:
     [
         [_row(START), _row(START)],
         [_row(START + 1)],
+        [
+            _row(START).replace(
+                str(START), str(START).translate(str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩"))
+            )
+        ],
+        ["²" + _row(START)],
         [_row(START - 60000)],
         [_row(START, "WRONG")],
         [_row(START).replace("-1.2", "nan")],

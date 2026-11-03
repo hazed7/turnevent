@@ -112,7 +112,7 @@ def _select(entries: Iterable[InputFile], selection: Selection) -> list[InputFil
 def _row(row: list[str], item: InputFile, day_start: int) -> tuple[int, str, *tuple[float, ...]]:
     if len(row) != len(HISTORICAL_COLUMNS):
         raise DataContractError(f"ragged CSV row: {item.relative}")
-    if not row[0].isdigit():
+    if not (row[0].isascii() and row[0].isdigit()):
         raise DataContractError(f"invalid integer timestamp: {item.relative}")
     timestamp = int(row[0])
     if timestamp % BAR_INTERVAL_MS or not day_start <= timestamp < day_start + DAY_MS:
