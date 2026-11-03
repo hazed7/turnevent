@@ -150,6 +150,19 @@ def test_synthetic_preserves_file_created_during_generation(
     assert not list(config.paths.dataset.parent.glob(".synthetic-*"))
 
 
+def test_synthetic_reports_unsupported_hard_links(
+    config: PipelineConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def unsupported(*_: object) -> None:
+        raise PermissionError("operation not permitted")
+
+    monkeypatch.setattr("core.files.os.link", unsupported)
+    with pytest.raises(ConfigError, match="cannot publish dataset"):
+        commands.synthetic(config)
+    assert not config.paths.dataset.exists()
+    assert not list(config.paths.dataset.parent.glob(".synthetic-*"))
+
+
 @pytest.mark.parametrize(
     ("filename", "dataset_name"),
     [

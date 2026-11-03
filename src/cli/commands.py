@@ -12,7 +12,7 @@ from artifact.bundle import MANIFEST_FILE, load_bundle
 from artifact.manifest import ModelManifest
 from cli.config import PipelineConfig
 from core.errors import ArtifactError, ConfigError
-from core.files import write_json, write_text_atomic
+from core.files import publish_exclusive, write_json, write_text_atomic
 from core.runtime import describe_runtime
 from dataset.audit import build_data_audit
 from dataset.cleaning import CleanDataset, clean_historical
@@ -52,10 +52,11 @@ def synthetic(config: PipelineConfig) -> Path:
         temporary = Path(directory) / "dataset.csv"
         write_synthetic_csv(config.synthetic, temporary)
         try:
-            # Atomic publication without replacing an existing file (including a concurrent writer).
-            os.link(temporary, path)
+            publish_exclusive((temporary, path))
         except FileExistsError as exc:
             raise ConfigError(f"refusing to overwrite dataset {path}; choose a new path") from exc
+        except OSError as exc:
+            raise ConfigError(f"cannot publish dataset {path}: {exc}") from exc
     return path
 
 
