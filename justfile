@@ -33,8 +33,9 @@ demo:
     uv run python -m cli demo
 
 # Forward selection/source/output options to the preparation script.
+[positional-arguments]
 data-prepare *args:
-    uv run python scripts/prepare_dataset.py {{ args }}
+    uv run python scripts/prepare_dataset.py "$@"
 
 data-audit config="configs/real-data.yaml":
     uv run python -m cli --config {{ quote(config) }} audit
