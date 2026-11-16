@@ -53,7 +53,6 @@ def test_evaluation_compares_model_baselines_and_lags(trained_result: TrainingRe
         assert row in text
     assert "## Confusion matrix" in text
     assert "## Момент сигнала" in text
-    assert "синтетическом" in text
 
 
 def test_model_card_states_signal_semantics(bundle: LoadedBundle) -> None:

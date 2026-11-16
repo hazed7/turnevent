@@ -39,7 +39,7 @@ def render_data_audit(
         ),
         section(
             "signal_barrier",
-            f"В источнике: **{'есть' if source.signal_barrier_present else 'нет'}**. "
+            f"В используемом датасете: **{'есть' if source.signal_barrier_present else 'нет'}**. "
             f"Загружены только колонки {', '.join(f'`{c}`' for c in audit.loaded_columns)}: "
             f"`{Column.SIGNAL_BARRIER}` не читается в память, поэтому не может попасть в "
             "признаки, разметку, веса или фильтры. Это проверяет property-тест: любые "

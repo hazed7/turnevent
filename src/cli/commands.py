@@ -37,7 +37,12 @@ from training.export import (
 from training.pipeline import Predictor, train_and_evaluate
 
 LATEST_FILE: Final = "LATEST"
-SMOKE_FIXTURES: Final = ("online-ready.json", "online-warmup.json", "online-invalid.json")
+SMOKE_FIXTURES: Final = (
+    "online-ready.json",
+    "online-warmup.json",
+    "online-invalid.json",
+    "online-invalid-envelope.json",
+)
 COMPARED_LAG: Final = 0
 
 
