@@ -1,6 +1,11 @@
 from artifact.manifest import ModelManifest
 from reporting.markdown import document, percent, section, table
 
+_ALGORITHMS = {
+    "logistic_regression": "LogisticRegression со StandardScaler",
+    "hist_gradient_boosting": "HistGradientBoostingClassifier (градиентный бустинг деревьев)",
+}
+
 
 def render_model_card(manifest: ModelManifest) -> str:
     metrics = manifest.metrics
@@ -24,8 +29,9 @@ def render_model_card(manifest: ModelManifest) -> str:
         ),
         section(
             "Модель",
-            "LogisticRegression со StandardScaler, `class_weight=balanced`, изотоническая "
-            "калибровка вероятностей по времени. Порог TURN-классов "
+            f"{_ALGORITHMS.get(manifest.algorithm, manifest.algorithm)}, "
+            "`class_weight=balanced`, изотоническая калибровка вероятностей по времени. "
+            "Алгоритм выбран по macro F1 на validation. Порог TURN-классов "
             f"{manifest.event_turn_threshold} выбран на validation. Признаки "
             f"`{manifest.feature_schema_version}`: {len(manifest.feature_names)} шт., "
             f"нормализация — {manifest.normalization_spec}.",

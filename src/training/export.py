@@ -54,6 +54,7 @@ def export_bundle(
         label_generator_version=LABEL_GENERATOR_VERSION,
         prediction_lag_bars=config.prediction_lag_bars,
         normalization_spec=schema.normalization,
+        algorithm=result.report.selected_algorithm.value,
         feature_names=result.event_classifier.feature_names,
         event_classes=EVENT_CLASSES,
         state_classes=STATE_CLASSES,

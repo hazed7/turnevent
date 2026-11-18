@@ -27,8 +27,17 @@ training:
     test_fraction: 0.2
     embargo_bars: 60
   model:
+    algorithms:                   # main first; at most one alternative, chosen on validation
+      - logistic_regression
+      - hist_gradient_boosting
     regularization: 1.0
     max_iter: 2000
+    boosting:
+      learning_rate: 0.05
+      max_iter: 300
+      max_leaf_nodes: 15
+      min_samples_leaf: 50
+      l2_regularization: 1.0
     calibrate: true
     calibration_folds: 3
     seed: 42

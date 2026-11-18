@@ -20,6 +20,9 @@ paths:
 synthetic:
   n_symbols: 2
   bars_per_symbol: 3000
+training:
+  model:
+    algorithms: [logistic_regression]
 """,
         encoding="utf-8",
     )
