@@ -11,7 +11,7 @@ from dataset.cleaning import CleanDataset
 from features.builder import build_offline_features
 from labels.definition import LabelSummary, summarize_labels
 from labels.generator import LabelConfig, LabelSet, generate_labels
-from training.baselines import MajorityBaseline, RdValueCrossBaseline
+from training.baselines import MajorityBaseline, RdValueExtremumBaseline
 from training.metrics import (
     EVENT_NAMES,
     STATE_NAMES,
@@ -52,7 +52,7 @@ class EvaluationReport(FrozenModel):
     labels: LabelSummary
     prediction_lag_bars: int
     selected_turn_threshold: float
-    selected_rd_rule_min_change: float
+    selected_rd_rule: RdValueExtremumBaseline
     validation_event: EventMetrics
     test_event: Mapping[Predictor, EventMetrics]
     test_state: ClassificationMetrics
@@ -83,7 +83,7 @@ def train_and_evaluate(clean: CleanDataset, config: TrainingConfig) -> TrainingR
     event_classifier = fit_event_classifier(train, validation, config.model)
     state_classifier = fit_state_classifier(train, config.model)
     majority = MajorityBaseline.fit(train.turn_event)
-    rd_rule = RdValueCrossBaseline.select(validation.features, validation.turn_event)
+    rd_rule = RdValueExtremumBaseline.select(validation.features, validation.turn_event)
 
     test_predictions = {
         Predictor.MAJORITY: majority.predict(test.features),
@@ -94,7 +94,7 @@ def train_and_evaluate(clean: CleanDataset, config: TrainingConfig) -> TrainingR
         labels=summarize_labels(labels),
         prediction_lag_bars=config.prediction_lag_bars,
         selected_turn_threshold=event_classifier.turn_threshold or 0.0,
-        selected_rd_rule_min_change=rd_rule.min_change,
+        selected_rd_rule=rd_rule,
         validation_event=event_metrics(
             validation.turn_event,
             event_classifier.predict(validation.features),

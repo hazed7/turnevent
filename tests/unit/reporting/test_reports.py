@@ -49,7 +49,7 @@ def test_data_audit_covers_the_sow_checklist(tmp_path: Path) -> None:
 def test_evaluation_compares_model_baselines_and_lags(trained_result: TrainingResult) -> None:
     by_lag = {3: trained_result.report.test_event[Predictor.MODEL]}
     text = render_evaluation("tm-x", trained_result.report, trained_result.split, by_lag)
-    for row in ("majority (no-skill)", "rule: rd_value cross", "| модель |"):
+    for row in ("majority (no-skill)", "rule: rd_value extremum", "| модель |"):
         assert row in text
     assert "## Confusion matrix" in text
     assert "## Момент сигнала" in text

@@ -42,7 +42,7 @@ def test_test_period_never_influences_any_choice(
 
     assert altered.split.periods[:2] == result.split.periods[:2]
     assert altered.report.selected_turn_threshold == result.report.selected_turn_threshold
-    assert altered.report.selected_rd_rule_min_change == result.report.selected_rd_rule_min_change
+    assert altered.report.selected_rd_rule == result.report.selected_rd_rule
     assert altered.report.validation_event == result.report.validation_event
 
 

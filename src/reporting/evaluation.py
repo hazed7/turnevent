@@ -7,7 +7,7 @@ from training.split import SplitManifest
 
 _PREDICTOR_NAMES = {
     Predictor.MAJORITY: "majority (no-skill)",
-    Predictor.RD_VALUE_RULE: "rule: rd_value cross",
+    Predictor.RD_VALUE_RULE: "rule: rd_value extremum",
     Predictor.MODEL: "модель",
 }
 
@@ -65,6 +65,7 @@ def render_evaluation(
             ),
             "false-turn rate — доля ошибочных среди предсказанных разворотов; задержка "
             "считается от бара разворота до первого сигнала того же направления.",
+            _rd_rule(report),
         ),
         section("Модель turn_event по классам", _per_class(model)),
         section("Confusion matrix turn_event (строки — истина)", _confusion(model)),
@@ -142,4 +143,15 @@ def _probabilities(title: str, metrics: ProbabilityMetrics) -> str:
             ],
         )
         + f"\n\nlog loss {metrics.log_loss:.4f}, Brier {metrics.brier_score:.4f}."
+    )
+
+
+def _rd_rule(report: EvaluationReport) -> str:
+    rule = report.selected_rd_rule
+    low, high = ("TURN_UP", "TURN_DOWN") if rule.direction == 1 else ("TURN_DOWN", "TURN_UP")
+    return (
+        f"Правило rd_value: значение {rule.reference_lag} бар(а) назад отклонилось от среднего "
+        f"за 20 баров не меньше чем на {rule.min_zscore} σ, а с тех пор rd_value вернулось "
+        f"назад не меньше чем на {rule.min_rebound} σ. Минимум rd_value → {low}, "
+        f"максимум → {high}. Все четыре параметра выбраны по macro F1 на validation."
     )
