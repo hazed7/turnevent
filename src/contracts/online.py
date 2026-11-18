@@ -94,7 +94,7 @@ class _Envelope(FrozenModel):
         actual = (self.timeframe, self.lookback_steps, self.feature_columns)
 
         if actual != expected:
-            raise ValueError(f"envelope heaer {actual} does not match contract {expected}")
+            raise ValueError(f"envelope header {actual} does not match contract {expected}")
         return self
 
 
@@ -110,7 +110,9 @@ def parse_envelope(payload: str | bytes) -> OnlineBatch:
     try:
         envelope = _Envelope.model_validate_json(payload)
     except ValidationError as exc:
-        raise InvalidInputError(f"invalid DS API envelope:\n{exc}") from exc
+        raise InvalidInputError(
+            f"invalid DS API envelope: {_describe(exc, skip=0, root='envelope')}"
+        ) from exc
 
     return OnlineBatch(
         generated_at=envelope.generated_at,
@@ -124,13 +126,14 @@ def _parse_item(item: JsonValue) -> ReadyWindow | PendingWindow | RejectedWindow
     except ValidationError as exc:
         symbol = item.get("symbol") if isinstance(item, dict) else None
         return RejectedWindow(
-            symbol=symbol if isinstance(symbol, str) else None, detail=_describe(exc)
+            symbol=symbol if isinstance(symbol, str) else None,
+            detail=_describe(exc, skip=1, root="item"),
         )
 
 
-def _describe(error: ValidationError, limit: int = 3) -> str:
+def _describe(error: ValidationError, *, skip: int, root: str, limit: int = 3) -> str:
     problems = [
-        f"{'.'.join(str(part) for part in issue['loc'][1:]) or 'item'}: {issue['msg']}"
+        f"{'.'.join(str(part) for part in issue['loc'][skip:]) or root}: {issue['msg']}"
         for issue in error.errors()[:limit]
     ]
     more = error.error_count() - limit

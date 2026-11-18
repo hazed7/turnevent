@@ -23,11 +23,12 @@ def run_inference(payload: str | bytes, bundle: LoadedBundle) -> InferenceBatch:
     try:
         envelope = parse_envelope(payload)
     except InvalidInputError as exc:
+        rejected = RejectedWindow(symbol=None, detail=str(exc))
         return InferenceBatch(
             generated_at=None,
             model_version=bundle.manifest.model_version,
             envelope_error=str(exc),
-            results=(),
+            results=(_without_prediction(rejected, WindowStatus.INVALID_INPUT, str(exc), bundle),),
         )
     return InferenceBatch(
         generated_at=envelope.generated_at,

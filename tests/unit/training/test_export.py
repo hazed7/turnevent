@@ -18,8 +18,8 @@ PROJECT_ROOT = Path(__file__).parents[3]
 
 
 @pytest.fixture(scope="module")
-def result(clean: CleanDataset) -> TrainingResult:
-    return train_and_evaluate(clean, TrainingConfig())
+def result(clean: CleanDataset, fast_training: TrainingConfig) -> TrainingResult:
+    return train_and_evaluate(clean, fast_training)
 
 
 @pytest.fixture(scope="module")

@@ -2,12 +2,18 @@ from collections.abc import Mapping
 
 from reporting.markdown import document, moment, percent, section, table
 from training.metrics import ClassificationMetrics, EventMetrics, ProbabilityMetrics
+from training.models import Algorithm
 from training.pipeline import EvaluationReport, Predictor
 from training.split import SplitManifest
 
+ALGORITHM_NAMES = {
+    Algorithm.LOGISTIC_REGRESSION: "LogisticRegression",
+    Algorithm.HIST_GRADIENT_BOOSTING: "HistGradientBoosting",
+}
+
 _PREDICTOR_NAMES = {
     Predictor.MAJORITY: "majority (no-skill)",
-    Predictor.RD_VALUE_RULE: "rule: rd_value cross",
+    Predictor.RD_VALUE_RULE: "rule: rd_value extremum",
     Predictor.MODEL: "модель",
 }
 
@@ -65,7 +71,9 @@ def render_evaluation(
             ),
             "false-turn rate — доля ошибочных среди предсказанных разворотов; задержка "
             "считается от бара разворота до первого сигнала того же направления.",
+            _rd_rule(report),
         ),
+        section("Выбор алгоритма", *_algorithms(report)),
         section("Модель turn_event по классам", _per_class(model)),
         section("Confusion matrix turn_event (строки — истина)", _confusion(model)),
         section(
@@ -109,8 +117,6 @@ def render_evaluation(
         ),
         section(
             "Ограничения",
-            "- Метрики посчитаны на синтетическом датасете и проверяют пайплайн, а не "
-            "качество на рынке.\n"
             f"- Классов TURN_* около {percent(model.true_share['TURN_UP'])} каждого; macro F1 "
             "сильно зависит от них.\n"
             "- Разметка и признаки зафиксированы до обучения; test не участвовал ни в одном "
@@ -144,4 +150,55 @@ def _probabilities(title: str, metrics: ProbabilityMetrics) -> str:
             ],
         )
         + f"\n\nlog loss {metrics.log_loss:.4f}, Brier {metrics.brier_score:.4f}."
+    )
+
+
+def _rd_rule(report: EvaluationReport) -> str:
+    rule = report.selected_rd_rule
+    low, high = ("TURN_UP", "TURN_DOWN") if rule.direction == 1 else ("TURN_DOWN", "TURN_UP")
+    return (
+        f"Правило rd_value: значение {rule.reference_lag} бар(а) назад отклонилось от среднего "
+        f"за 20 баров не меньше чем на {rule.min_zscore} σ, а с тех пор rd_value вернулось "
+        f"назад не меньше чем на {rule.min_rebound} σ. Минимум rd_value → {low}, "
+        f"максимум → {high}. Все четыре параметра выбраны по macro F1 на validation."
+    )
+
+
+def _algorithms(report: EvaluationReport) -> tuple[str, ...]:
+    selected = ALGORITHM_NAMES[report.selected_algorithm]
+    intro = (
+        "Основной алгоритм — LogisticRegression; альтернатива — градиентный бустинг "
+        "деревьев (HistGradientBoosting). Причина эксперимента: метка — пороговое правило "
+        "по ценам (экстремум окна и откат относительно ATR), а линейная модель не выражает "
+        "такие условия «и/если». Оба алгоритма обучены на train с одинаковыми признаками, "
+        "весами классов и калибровкой; порог TURN-классов подобран на validation для каждого. "
+        f"В bundle попадает алгоритм с лучшим macro F1 на validation: **{selected}**. "
+        "Test показан для справки и в выборе не участвовал."
+    )
+    rows = [
+        [
+            ALGORITHM_NAMES[algorithm],
+            report.validation_by_algorithm[algorithm].macro_f1,
+            test.macro_f1,
+            test.balanced_accuracy,
+            percent(test.false_turn_rate),
+            percent(test.detection.detection_rate),
+            "да" if algorithm is report.selected_algorithm else "",
+        ]
+        for algorithm, test in report.test_by_algorithm.items()
+    ]
+    return (
+        intro,
+        table(
+            [
+                "Алгоритм",
+                "validation macro F1",
+                "test macro F1",
+                "test balanced acc",
+                "test false-turn rate",
+                "test найдено",
+                "выбран",
+            ],
+            rows,
+        ),
     )

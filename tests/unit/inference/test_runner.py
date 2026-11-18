@@ -96,11 +96,29 @@ def test_ready_window_with_impossible_prices_is_invalid(
     assert second.status is WindowStatus.PREDICTED
 
 
-def test_broken_envelope_is_reported_without_results(bundle: LoadedBundle) -> None:
+def test_broken_envelope_becomes_one_invalid_input_result(bundle: LoadedBundle) -> None:
     batch = run_inference("{not json", bundle)
-    assert batch.results == ()
     assert batch.envelope_error is not None
     assert batch.model_version == bundle.manifest.model_version
+    (result,) = batch.results
+    assert result.status is WindowStatus.INVALID_INPUT
+    assert result.symbol is None
+    assert result.window_end_timestamp is None
+    assert result.prediction is None
+    assert result.reason == batch.envelope_error
+
+
+def test_envelope_header_mismatch_is_invalid_input(
+    bundle: LoadedBundle, load_fixture: LoadFixture
+) -> None:
+    envelope = load_fixture("online-ready.json")
+    envelope["timeframe"] = "5m"
+    (result,) = run_inference(json.dumps(envelope), bundle).results
+    assert result.status is WindowStatus.INVALID_INPUT
+    assert result.reason is not None
+    assert result.reason.startswith("invalid DS API envelope: envelope: ")
+    assert "\n" not in result.reason
+    assert "'5m'" in result.reason
 
 
 class _Broken:

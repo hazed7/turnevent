@@ -14,10 +14,13 @@ from dataset.manifest import build_dataset_manifest
 from dataset.synthetic import SyntheticConfig, write_synthetic_csv
 from features.builder import FEATURE_NAMES, build_offline_features
 from training.export import export_bundle
+from training.models import BoostingConfig, ModelConfig
 from training.pipeline import TrainingConfig, TrainingResult, train_and_evaluate
 
 PROJECT_ROOT = Path(__file__).parents[1]
 FIXTURES_DIR = PROJECT_ROOT / "fixtures"
+FAST_MODEL = ModelConfig(boosting=BoostingConfig(max_iter=20))
+FAST_TRAINING = TrainingConfig(model=FAST_MODEL)
 
 
 @dataclass(frozen=True)
@@ -26,6 +29,16 @@ class Trained:
     result: TrainingResult
     directory: Path
     features: pd.DataFrame
+
+
+@pytest.fixture(scope="session")
+def fast_model() -> ModelConfig:
+    return FAST_MODEL
+
+
+@pytest.fixture(scope="session")
+def fast_training() -> TrainingConfig:
+    return FAST_TRAINING
 
 
 @pytest.fixture
@@ -42,10 +55,10 @@ def trained(tmp_path_factory: pytest.TempPathFactory) -> Trained:
     write_synthetic_csv(SyntheticConfig(n_symbols=2, bars_per_symbol=3_000), source)
     raw = load_historical(source)
     clean = clean_historical(raw.frame)
-    result = train_and_evaluate(clean, TrainingConfig())
+    result = train_and_evaluate(clean, FAST_TRAINING)
     directory = tmp_path_factory.mktemp("bundle")
     dataset = build_dataset_manifest(raw, clean)
-    export_bundle(result, TrainingConfig(), dataset, describe_runtime(PROJECT_ROOT), directory)
+    export_bundle(result, FAST_TRAINING, dataset, describe_runtime(PROJECT_ROOT), directory)
     features = build_offline_features(clean)[list(FEATURE_NAMES)].head(500)
     return Trained(clean=clean, result=result, directory=directory, features=features)
 

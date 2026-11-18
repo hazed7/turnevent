@@ -65,6 +65,27 @@ def test_shadow_inference_publishes_once_and_logs_telemetry(trained: PipelineCon
     assert len(_lines(trained.paths.runs / "telemetry.jsonl")) == len(first) + len(again)
 
 
+def test_invalid_envelope_is_logged_to_telemetry_and_not_published(
+    trained: PipelineConfig,
+) -> None:
+    fixture = trained.paths.fixtures / "online-invalid-envelope.json"
+    (decision,) = commands.infer(trained, fixture=fixture, url=None, mode=Mode.SHADOW)
+
+    assert decision.status == "invalid_input"
+    assert decision.outcome is Outcome.NOT_PUBLISHABLE
+    (record,) = _lines(trained.paths.runs / "telemetry.jsonl")
+    assert record["status"] == "invalid_input"
+    assert record["symbol"] is None
+    assert str(record["reason"]).startswith("invalid DS API envelope")
+    assert _lines(trained.paths.runs / "outbox.jsonl") == []
+
+
+def test_smoke_report_covers_invalid_envelope(trained: PipelineConfig) -> None:
+    text = (trained.paths.reports / "online-inference.md").read_text(encoding="utf-8")
+    assert "`online-invalid-envelope.json`" in text
+    assert "invalid_input → not_publishable | 1" in text
+
+
 def test_inference_can_read_the_ds_api(
     trained: PipelineConfig, monkeypatch: pytest.MonkeyPatch
 ) -> None:

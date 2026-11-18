@@ -11,7 +11,7 @@ from dataset.cleaning import CleanDataset
 from features.builder import build_offline_features
 from labels.definition import LabelSummary, summarize_labels
 from labels.generator import LabelConfig, LabelSet, generate_labels
-from training.baselines import MajorityBaseline, RdValueCrossBaseline
+from training.baselines import MajorityBaseline, RdValueExtremumBaseline
 from training.metrics import (
     EVENT_NAMES,
     STATE_NAMES,
@@ -23,7 +23,7 @@ from training.metrics import (
     event_metrics,
     probability_metrics,
 )
-from training.models import ModelConfig, fit_event_classifier, fit_state_classifier
+from training.models import Algorithm, ModelConfig, fit_event_classifier, fit_state_classifier
 from training.samples import assemble_samples
 from training.split import Part, SplitConfig, SplitManifest, time_split
 
@@ -51,10 +51,13 @@ class TrainingConfig(FrozenModel):
 class EvaluationReport(FrozenModel):
     labels: LabelSummary
     prediction_lag_bars: int
+    selected_algorithm: Algorithm
     selected_turn_threshold: float
-    selected_rd_rule_min_change: float
+    selected_rd_rule: RdValueExtremumBaseline
     validation_event: EventMetrics
     test_event: Mapping[Predictor, EventMetrics]
+    validation_by_algorithm: Mapping[Algorithm, EventMetrics]
+    test_by_algorithm: Mapping[Algorithm, EventMetrics]
     test_state: ClassificationMetrics
     test_event_probabilities: ProbabilityMetrics
     test_state_probabilities: ProbabilityMetrics
@@ -80,10 +83,24 @@ def train_and_evaluate(clean: CleanDataset, config: TrainingConfig) -> TrainingR
     parts, split = time_split(samples, config.split)
     train, validation, test = parts[Part.TRAIN], parts[Part.VALIDATION], parts[Part.TEST]
 
-    event_classifier = fit_event_classifier(train, validation, config.model)
-    state_classifier = fit_state_classifier(train, config.model)
+    candidates = {
+        algorithm: fit_event_classifier(train, validation, config.model, algorithm)
+        for algorithm in config.model.algorithms
+    }
+    validation_by_algorithm = {
+        algorithm: event_metrics(
+            validation.turn_event,
+            classifier.predict(validation.features),
+            validation.keys,
+            config.evaluation,
+        )
+        for algorithm, classifier in candidates.items()
+    }
+    selected = max(config.model.algorithms, key=lambda a: validation_by_algorithm[a].macro_f1)
+    event_classifier = candidates[selected]
+    state_classifier = fit_state_classifier(train, config.model, selected)
     majority = MajorityBaseline.fit(train.turn_event)
-    rd_rule = RdValueCrossBaseline.select(validation.features, validation.turn_event)
+    rd_rule = RdValueExtremumBaseline.select(validation.features, validation.turn_event)
 
     test_predictions = {
         Predictor.MAJORITY: majority.predict(test.features),
@@ -93,17 +110,23 @@ def train_and_evaluate(clean: CleanDataset, config: TrainingConfig) -> TrainingR
     report = EvaluationReport(
         labels=summarize_labels(labels),
         prediction_lag_bars=config.prediction_lag_bars,
+        selected_algorithm=selected,
         selected_turn_threshold=event_classifier.turn_threshold or 0.0,
-        selected_rd_rule_min_change=rd_rule.min_change,
-        validation_event=event_metrics(
-            validation.turn_event,
-            event_classifier.predict(validation.features),
-            validation.keys,
-            config.evaluation,
-        ),
+        selected_rd_rule=rd_rule,
+        validation_event=validation_by_algorithm[selected],
         test_event={
             name: event_metrics(test.turn_event, predicted, test.keys, config.evaluation)
             for name, predicted in test_predictions.items()
+        },
+        validation_by_algorithm=validation_by_algorithm,
+        test_by_algorithm={
+            algorithm: event_metrics(
+                test.turn_event,
+                classifier.predict(test.features),
+                test.keys,
+                config.evaluation,
+            )
+            for algorithm, classifier in candidates.items()
         },
         test_state=classification_metrics(
             test.turn_state, state_classifier.predict(test.features), STATE_NAMES

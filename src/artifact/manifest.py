@@ -42,6 +42,7 @@ class ModelManifest(FrozenModel):
     window_length: int = WINDOW_LENGTH
     prediction_lag_bars: int
     normalization_spec: str
+    algorithm: str = "logistic_regression"
     feature_names: tuple[str, ...]
     event_classes: tuple[ClassDefinition, ...]
     state_classes: tuple[ClassDefinition, ...]
